@@ -1,8 +1,11 @@
+import { Text } from "@/components/Themed";
 import Colors from "@/constants/Colors";
+import { supabase } from "@/lib/supabase";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link, Stack } from "expo-router";
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, TouchableOpacity } from "react-native";
+import { Button } from "react-native-elements";
 
 export default function MenuStack() {
   return (
@@ -21,6 +24,11 @@ export default function MenuStack() {
               )}
             </Pressable>
           </Link>
+        ),
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => supabase.auth.signOut()}>
+            <Text>Sign out</Text>
+          </TouchableOpacity>
         ),
       }}
     >

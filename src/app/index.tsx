@@ -20,18 +20,22 @@ const Home = () => {
     return <Redirect href="/(user)" />;
   }
 
-  return (
-    <View style={{ flex: 1, justifyContent: "center", padding: 10 }}>
-      <Link href={"/(user)"} asChild>
-        <Button text="User" />
-      </Link>
-      <Link href={"/(admin)"} asChild>
-        <Button text="Admin" />
-      </Link>
+  if (isAdmin) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", padding: 10 }}>
+        <Link href={"/(user)"} asChild>
+          <Button text="User" />
+        </Link>
+        <Link href={"/(admin)"} asChild>
+          <Button text="Admin" />
+        </Link>
 
-      <Button onPress={() => supabase.auth.signOut()} text="Sign out" />
-    </View>
-  );
+        <Button onPress={() => supabase.auth.signOut()} text="Sign out" />
+      </View>
+    );
+  }
+
+  return <Redirect href="/(user)" />;
 };
 
 export default Home;
