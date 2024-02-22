@@ -5,15 +5,19 @@ import React from "react";
 import { ActivityIndicator, View } from "react-native";
 import Button from "../components/Button";
 
-const index = () => {
-  const { session, loading } = useAuth();
+const Home = () => {
+  const { session, loading, isAdmin } = useAuth();
 
   if (loading) {
     return <ActivityIndicator />;
   }
 
   if (!session) {
-    return <Redirect href="/(auth)/sign-in" />;
+    return <Redirect href="/sign-in" />;
+  }
+
+  if (!isAdmin) {
+    return <Redirect href="/(user)" />;
   }
 
   return (
@@ -24,13 +28,10 @@ const index = () => {
       <Link href={"/(admin)"} asChild>
         <Button text="Admin" />
       </Link>
-      <Link href={"/sign-in"} asChild>
-        <Button text="Sign in" />
-      </Link>
 
       <Button onPress={() => supabase.auth.signOut()} text="Sign out" />
     </View>
   );
 };
 
-export default index;
+export default Home;
