@@ -1,3 +1,4 @@
+import { useColorScheme } from "@components/useColorScheme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
@@ -9,8 +10,8 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
-import { useColorScheme } from "@components/useColorScheme";
 import AuthProvider from "@/providers/AuthProvider";
+import QueryProvider from "@/providers/QueryProvider";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -55,12 +56,15 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <AuthProvider>
-        <Stack>
-          <Stack.Screen name="(admin)" options={{ headerShown: false }} />
-          <Stack.Screen name="(user)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="cart" options={{ presentation: "modal" }} />
-        </Stack>
+        <QueryProvider>
+          <Stack>
+            <Stack.Screen name={"(admin)"} options={{ headerShown: false }} />
+            <Stack.Screen name={"(user)"} options={{ headerShown: false }} />
+            <Stack.Screen name={"(auth)"} options={{ headerShown: false }} />
+            <Stack.Screen name={"index"} options={{ headerShown: false }} />
+            <Stack.Screen name={"cart"} options={{ presentation: "modal" }} />
+          </Stack>
+        </QueryProvider>
       </AuthProvider>
     </ThemeProvider>
   );

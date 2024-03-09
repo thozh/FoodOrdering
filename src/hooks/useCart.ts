@@ -1,6 +1,7 @@
-import { atom, useAtom } from "jotai";
-import { CartItem, Product } from "../types";
 import { randomUUID } from "expo-crypto";
+import { atom, useAtom } from "jotai";
+
+import { CartItem, Product } from "../types";
 
 const cartItemsAtom = atom<CartItem[]>([]);
 

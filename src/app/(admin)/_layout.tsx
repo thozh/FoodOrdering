@@ -17,8 +17,9 @@ export default function TabLayout() {
   const { isAdmin } = useAuth();
 
   if (!isAdmin) {
-    return <Redirect href="/" />;
+    return <Redirect href={"/"} />;
   }
+
   return (
     <Tabs
       screenOptions={{
@@ -29,23 +30,23 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen name="index" options={{ href: null }} />
+      <Tabs.Screen name={"index"} options={{ href: null }} />
       <Tabs.Screen
-        name="menu"
+        name={"menu"}
         options={{
           title: "Menu",
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="cutlery" color={color} />
+            <TabBarIcon name={"cutlery"} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="orders"
+        name={"orders"}
         options={{
           headerShown: false,
           title: "Orders",
-          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name={"list"} color={color} />,
         }}
       />
     </Tabs>

@@ -1,10 +1,12 @@
-import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
+import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
+
 import orders from "../../../../assets/data/orders";
 import OrderListItem from "../../../components/OrderListItem";
+
 import OrderItemListItem from "@/components/OrderItemListItem";
-import { OrderStatusList } from "@/types";
 import Colors from "@/constants/Colors";
+import { OrderStatusList } from "@/types";
 
 const OrderDetailScreen = () => {
   const { id } = useLocalSearchParams();
@@ -12,7 +14,7 @@ const OrderDetailScreen = () => {
   const order = orders.find((o) => o.id.toString() === id);
 
   if (!order) {
-    return <Text>Order not found!</Text>;
+    return <Text>{"Order not found!"}</Text>;
   }
 
   return (
@@ -26,7 +28,7 @@ const OrderDetailScreen = () => {
         ListHeaderComponent={() => <OrderListItem order={order} />}
         ListFooterComponent={() => (
           <>
-            <Text style={{ fontWeight: "bold" }}>Status</Text>
+            <Text style={{ fontWeight: "bold" }}>{"Status"}</Text>
             <View style={{ flexDirection: "row", gap: 5 }}>
               {OrderStatusList.map((status) => (
                 <Pressable

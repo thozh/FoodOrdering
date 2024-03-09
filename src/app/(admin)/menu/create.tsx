@@ -1,20 +1,41 @@
-import { View, Text, StyleSheet, Image, TextInput, Alert } from "react-native";
-import React, { useState } from "react";
-import { defaultPizzaImage } from "../../../constants/Images";
-import Colors from "../../../constants/Colors";
-import Button from "../../../components/Button";
 import * as ImagePicker from "expo-image-picker";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Image, TextInput, Alert } from "react-native";
+
+import Button from "../../../components/Button";
+import Colors from "../../../constants/Colors";
+import { defaultPizzaImage } from "../../../constants/Images";
+
+import {
+  useDeleteProduct,
+  useInsertProduct,
+  useProduct,
+  useUpdateProduct,
+} from "@/api/products";
 
 const CreateScreen = () => {
   const [image, setImage] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [errors, setErrors] = useState("");
-
   const router = useRouter();
-  const { id } = useLocalSearchParams();
-  const isUpdating = !!id;
+  const { id: idString } = useLocalSearchParams();
+  const id = parseFloat(typeof idString === "string" ? idString : idString[0]);
+  const isUpdating = !!idString;
+
+  const { mutate: insertProduct } = useInsertProduct();
+  const { mutate: updateProduct } = useUpdateProduct();
+  const { data: updatingProduct } = useProduct(id);
+  const { mutate: deleteProduct } = useDeleteProduct();
+
+  useEffect(() => {
+    if (updatingProduct) {
+      setName(updatingProduct.name);
+      setPrice(updatingProduct.price.toString());
+      setImage(updatingProduct.image);
+    }
+  }, []);
 
   const validateInput = () => {
     setErrors("");
@@ -44,31 +65,57 @@ const CreateScreen = () => {
       return;
     }
 
-    console.warn("Creating dish");
-    resetFields();
-    router.back();
+    insertProduct(
+      {
+        name,
+        price: parseFloat(price),
+        image,
+      },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+      }
+    );
   };
 
-  const onUpdateCreate = () => {
+  const onUpdate = () => {
     if (!validateInput()) {
       return;
     }
 
-    console.warn("Update product");
-    resetFields();
-    router.back();
+    updateProduct(
+      { id, name, price: parseFloat(price), image },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+      }
+    );
+  };
+
+  const onDelete = () => {
+    deleteProduct(id, {
+      onSuccess: () => {
+        resetFields();
+        router.replace("/(admin)");
+      },
+    });
   };
 
   const onSubmit = () => {
     if (isUpdating) {
-      onUpdateCreate();
+      onUpdate();
     } else {
       onCreate();
     }
   };
+
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
@@ -80,10 +127,6 @@ const CreateScreen = () => {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
-  };
-
-  const onDelete = () => {
-    console.warn("delete");
   };
 
   const confirmDelete = () => {
@@ -107,33 +150,33 @@ const CreateScreen = () => {
       <Image
         source={{ uri: image || defaultPizzaImage }}
         style={styles.image}
-        resizeMode="contain"
+        resizeMode={"contain"}
       />
       <Text onPress={pickImage} style={styles.textButton}>
-        Select Image
+        {"Select Image"}
       </Text>
 
-      <Text style={styles.label}>Name</Text>
+      <Text style={styles.label}>{"Name"}</Text>
       <TextInput
         value={name}
         onChangeText={setName}
-        placeholder="Margarita..."
+        placeholder={"Margarita..."}
         style={styles.input}
       />
 
-      <Text style={styles.label}>Price ($)</Text>
+      <Text style={styles.label}>{"Price ($)"}</Text>
       <TextInput
         value={price}
         onChangeText={setPrice}
-        placeholder="9.99"
+        placeholder={"9.99"}
         style={styles.input}
-        keyboardType="numeric"
+        keyboardType={"numeric"}
       />
       <Text style={styles.error}>{errors}</Text>
       <Button onPress={onSubmit} text={isUpdating ? "Update" : "Create"} />
       {isUpdating && (
         <Text style={styles.textButton} onPress={confirmDelete}>
-          Delete
+          {"Delete"}
         </Text>
       )}
     </View>

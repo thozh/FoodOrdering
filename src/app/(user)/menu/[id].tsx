@@ -1,25 +1,43 @@
-import { defaultPizzaImage } from "@/constants/Images";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import products from "../../../../assets/data/products";
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
 import Button from "../../../components/Button";
 import { PizzaSize } from "../../../types";
+
+import { useProduct } from "@/api/products";
+import { defaultPizzaImage } from "@/constants/Images";
 import { useCart } from "@/hooks/useCart";
 
 const sizes: PizzaSize[] = ["S", "M", "L", "XL"];
 
 const ProductDetailsScreen = () => {
-  const { id } = useLocalSearchParams();
-  const product = products.find((p) => p.id.toString() === id);
+  const { id: idString } = useLocalSearchParams();
+  const [selectedSize, setSelectedSize] = useState<PizzaSize>("M");
   const { addItem } = useCart();
   const router = useRouter();
+  const {
+    data: product,
+    error,
+    isLoading,
+  } = useProduct(
+    parseFloat(typeof idString === "string" ? idString : idString[0])
+  );
 
-  if (!product) {
-    return <Text>Product not found</Text>;
+  if (isLoading) {
+    return <ActivityIndicator />;
   }
 
-  const [selectedSize, setSelectedSize] = useState<PizzaSize>("M");
+  if (error) {
+    return <Text>{"Failed to fetch product"}</Text>;
+  }
 
   const addToCart = () => {
     if (!product) return;
@@ -34,10 +52,10 @@ const ProductDetailsScreen = () => {
       <Image
         source={{ uri: product.image || defaultPizzaImage }}
         style={styles.image}
-        resizeMode="contain"
+        resizeMode={"contain"}
       />
 
-      <Text style={styles.subtitle}>Select size</Text>
+      <Text style={styles.subtitle}>{"Select size"}</Text>
       <View style={styles.sizes}>
         {sizes.map((size) => (
           <Pressable
@@ -61,8 +79,11 @@ const ProductDetailsScreen = () => {
           </Pressable>
         ))}
       </View>
-      <Text style={styles.price}>Price: ${product.price.toFixed(2)}</Text>
-      <Button onPress={addToCart} text="Add to cart" />
+      <Text style={styles.price}>
+        {"Price: $"}
+        {product.price.toFixed(2)}
+      </Text>
+      <Button onPress={addToCart} text={"Add to cart"} />
     </View>
   );
 };

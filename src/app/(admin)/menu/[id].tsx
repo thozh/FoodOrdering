@@ -1,20 +1,35 @@
-import { defaultPizzaImage } from "@/constants/Images";
-import { Stack, useLocalSearchParams } from "expo-router";
-import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import products from "../../../../assets/data/products";
-import { Link } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
+import { Link, Stack, useLocalSearchParams } from "expo-router";
+import React from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+import { useProduct } from "@/api/products";
 import Colors from "@/constants/Colors";
+import { defaultPizzaImage } from "@/constants/Images";
 
 const ProductDetailsScreen = () => {
   const { id } = useLocalSearchParams();
-  const product = products.find((p) => p.id.toString() === id);
 
-  if (!product) {
-    return <Text>Product not found</Text>;
+  const {
+    data: product,
+    error,
+    isLoading,
+  } = useProduct(parseFloat(typeof id === "string" ? id : id[0]));
+
+  if (isLoading) {
+    return <ActivityIndicator />;
   }
 
+  if (error) {
+    return <Text>{"Failed to fetch product"}</Text>;
+  }
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -25,7 +40,7 @@ const ProductDetailsScreen = () => {
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
-                    name="pencil"
+                    name={"pencil"}
                     size={25}
                     color={Colors.light.tint}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
@@ -41,11 +56,14 @@ const ProductDetailsScreen = () => {
       <Image
         source={{ uri: product.image || defaultPizzaImage }}
         style={styles.image}
-        resizeMode="contain"
+        resizeMode={"contain"}
       />
 
       <Text style={styles.title}>{product.name}</Text>
-      <Text style={styles.price}>${product.price}</Text>
+      <Text style={styles.price}>
+        {"$"}
+        {product.price}
+      </Text>
     </View>
   );
 };
